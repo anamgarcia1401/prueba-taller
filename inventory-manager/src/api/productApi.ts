@@ -1,38 +1,42 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import type { AxiosInstance } from "axios";
-import type { Product } from "../types";
+import type { Product } from "../types"; // ✅ ESTA LÍNEA ARREGLA EL ERROR
 
+let productos: Product[] = [
+  { id: "1", nombre: "Camiseta", descripcion: "De algodón", precio: 45000 },
+  { id: "2", nombre: "Pantalón", descripcion: "De jean", precio: 80000 },
+];
 
-const SUPABASE_URL = "https://qkclmecrwnaqmrplcroq.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFrY2xtZWNyd25hcW1ycGxjcm9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1OTQ1OTIsImV4cCI6MjA3NzE3MDU5Mn0.gaKXvANpaTD3PQpin2kJqn3g_itawi5N5XMtojXwkYM";
-
-const axiosInstance: AxiosInstance = axios.create({
-  baseURL: `${SUPABASE_URL}/rest/v1`,
-  headers: {
-    "Content-Type": "application/json",
-    apikey: SUPABASE_KEY,
-    Authorization: `Bearer ${SUPABASE_KEY}`,
-    Prefer: "return=representation",
-  },
+// Leer todos
+export const fetchProducts = createAsyncThunk("products/fetch", async () => {
+  await new Promise((r) => setTimeout(r, 200));
+  return productos;
 });
 
-export const fetchProducts = createAsyncThunk("products/fetchProducts", async () => {
-  const res = await axiosInstance.get("products?select=*&order=id.desc");
-  return res.data;
-});
+// Crear
+export const createProduct = createAsyncThunk(
+  "products/create",
+  async (nuevo: { nombre: string; descripcion: string; precio: number }) => {
+    await new Promise((r) => setTimeout(r, 200));
+    const nuevoProd = { ...nuevo, id: String(Date.now()) };
+    productos.push(nuevoProd);
+    return nuevoProd;
+  }
+);
 
-export const createProduct = createAsyncThunk("products/createProduct", async (newProduct: Omit<Product, "id" | "created_at">) => {
-  const res = await axiosInstance.post("products", newProduct);
-  return res.data[0];
-});
-
-export const updateProduct = createAsyncThunk("products/updateProduct", async (product: Product) => {
-  const res = await axiosInstance.put(`products?id=eq.${product.id}`, product);
-  return res.data[0];
-});
-
-export const deleteProduct = createAsyncThunk("products/deleteProduct", async (id: string) => {
-  await axiosInstance.delete(`products?id=eq.${id}`);
+// Eliminar
+export const deleteProduct = createAsyncThunk("products/delete", async (id: string) => {
+  await new Promise((r) => setTimeout(r, 200));
+  productos = productos.filter((p) => p.id !== id);
   return id;
 });
+
+// Actualizar
+export const updateProduct = createAsyncThunk(
+  "products/update",
+  async (prod: { id: string; nombre: string; descripcion: string; precio: number }) => {
+    await new Promise((r) => setTimeout(r, 200));
+    const i = productos.findIndex((p) => p.id === prod.id);
+    if (i !== -1) productos[i] = prod;
+    return prod;
+  }
+);

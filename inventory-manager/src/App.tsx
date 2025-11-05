@@ -1,14 +1,13 @@
-import "./App.css";
 import ProductForm from "./components/ProductForm";
 import ProductList from "./components/ProductList";
 
-export default function App() {
+function App() {
   return (
-    <div className="container">
-      <h1>Gestión de Productos</h1>
+    <div>
       <ProductForm />
-      <hr />
       <ProductList />
     </div>
   );
 }
+
+export default App;

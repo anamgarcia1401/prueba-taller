@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { Product } from "../types";
 import { fetchProducts, createProduct, deleteProduct, updateProduct } from "../api/productApi";
+import type { Product } from "../types";
 
 const initialState = {
   list: [] as Product[],
@@ -14,26 +14,18 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProducts.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(fetchProducts.fulfilled, (state, action) => {
-        state.loading = false;
         state.list = action.payload;
-      })
-      .addCase(fetchProducts.rejected, (state) => {
-        state.loading = false;
-        state.error = "Error al cargar productos";
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         state.list.push(action.payload);
       })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.list = state.list.filter((p) => p.id !== action.payload);
+      })
       .addCase(updateProduct.fulfilled, (state, action) => {
         const i = state.list.findIndex((p) => p.id === action.payload.id);
         if (i !== -1) state.list[i] = action.payload;
-      })
-      .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.list = state.list.filter((p) => p.id !== action.payload);
       });
   },
 });
